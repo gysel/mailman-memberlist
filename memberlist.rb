@@ -43,7 +43,12 @@ a.get("http://#{domain}/cgi-bin/mailman/admin/#{listname}/") do |page|
       name = name_node['value']
     end
 
-    puts name + " <" + email + ">" unless name.empty?
+    unless email.empty?
+      unless name.empty?
+        email = " <" + email + ">"
+      end
+      puts name + email
+    end
   end
 
   page_memberlist.link_with(:text => /Logout/).click
