@@ -18,6 +18,8 @@ a = Mechanize.new { |agent|
   agent.user_agent_alias = 'Windows Mozilla'
 }
 
+persons = []
+
 a.get("http://#{domain}/cgi-bin/mailman/admin/#{listname}/") do |page|
 
   # Submit the login form
@@ -44,10 +46,7 @@ a.get("http://#{domain}/cgi-bin/mailman/admin/#{listname}/") do |page|
     end
 
     unless email.empty?
-      unless name.empty?
-        email = " <" + email + ">"
-      end
-      puts name + email
+      persons << {:name => name, :email => email}
     end
   end
 
@@ -55,4 +54,8 @@ a.get("http://#{domain}/cgi-bin/mailman/admin/#{listname}/") do |page|
 
 end
 
-
+persons.sort{ |a,b| a[:name] <=> b[:name] }.each do |person|
+  name = person[:name]
+  name = "-" if name.empty?
+  puts "#{name} <#{person[:email]}>"
+end
