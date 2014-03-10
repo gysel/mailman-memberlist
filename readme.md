@@ -7,4 +7,4 @@ This script logs in to mailman and extracts the email addresses and names.
 
 Usage:
 
-    ./memberlist.rb domain.tld listname password
+    ./memberlist.rb -d domain.tld -l listname -p password
