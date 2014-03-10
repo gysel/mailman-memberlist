@@ -29,9 +29,9 @@ if options.domain.nil? || options.listname.nil? || options.password.nil?
   exit 1
 end
 
-a = Mechanize.new { |agent|
+a = Mechanize.new do |agent|
   agent.user_agent_alias = 'Windows Mozilla'
-}
+end
 
 persons = []
 
@@ -47,24 +47,16 @@ a.get("http://#{options.domain}/cgi-bin/mailman/admin/#{options.listname}/") do 
   page_memberlist = page_memberlist.link_with(text: /\[Mitgliederliste\]/).click
 
   page_memberlist.parser.css('center tr td').each do |e|
-    email = ''
-    name = ''
+    email_node = e.at_css 'a'
+    email = email_node.nil? ? '' : email_node.content 
 
-    email_node = e.at_css('a')
-    unless email_node.nil?
-      email = email_node.content
-    end
-    name_node = e.at_css('input[type=\'TEXT\']')
-    unless name_node.nil?
-      name = name_node['value']
-    end
+    name_node = e.at_css 'input[type=\'TEXT\']'
+    name = name_node.nil? ? '' : name_node['value'] 
 
-    unless email.empty?
-      persons << {:name => name, :email => email}
-    end
+    persons << {name: name, email: email} unless email.empty?
   end
 
-  page_memberlist.link_with(:text => /Logout/).click
+  page_memberlist.link_with(text: /Logout/).click
 
 end
 
