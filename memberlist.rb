@@ -3,16 +3,31 @@
 require 'rubygems'
 require 'mechanize'
 require 'nokogiri'
+require 'optparse'
+require 'ostruct'
 
-domain = ARGV[0]
-listname = ARGV[1]
-password = ARGV[2]
+options = OpenStruct.new
+opts = OptionParser.new do |opts|
+  opts.banner = "Usage: example.rb [options]"
 
-if domain.nil? || listname.nil? || password.nil?
-  puts "\nparameter missing! \ncorrect usage: ./memberlist.rb domain.tld listname password"
-  exit 2
+  opts.on("-d", "--domain DOMAINNAME", "Mandatory Domain name") do |p|
+    options.domain = p
+  end
+  opts.on("-l", "--list LISTNAME", "Mandatory List name") do |p|
+    options.listname = p
+  end
+  opts.on("-p", "--password PASSWORD", "Mandatory Password") do |p|
+    options.password = p
+  end
 end
 
+opts.parse!
+
+if options.domain.nil? || options.listname.nil? || options.password.nil?
+  puts "Missing argument!\n\n"
+  puts opts
+  exit 1
+end
 
 a = Mechanize.new { |agent|
   agent.user_agent_alias = 'Windows Mozilla'
@@ -20,11 +35,11 @@ a = Mechanize.new { |agent|
 
 persons = []
 
-a.get("http://#{domain}/cgi-bin/mailman/admin/#{listname}/") do |page|
+a.get("http://#{options.domain}/cgi-bin/mailman/admin/#{options.listname}/") do |page|
 
   # Submit the login form
   page_start = page.form_with(method: 'POST') do |f|
-    f.adminpw  = password
+    f.adminpw  = options.password
   end.click_button
 
   # Navigate to the member list
