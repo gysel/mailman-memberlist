@@ -23,16 +23,15 @@ persons = []
 a.get("http://#{domain}/cgi-bin/mailman/admin/#{listname}/") do |page|
 
   # Submit the login form
-  page_start = page.form_with(:method => 'POST') do |f|
+  page_start = page.form_with(method: 'POST') do |f|
     f.adminpw  = password
   end.click_button
 
   # Navigate to the member list
-  page_memberlist = page_start.link_with(:text => /Mitglieder-Verwaltung(.*)/).click
-  page_memberlist = page_memberlist.link_with(:text => /\[Mitgliederliste\]/).click
+  page_memberlist = page_start.link_with(text: /Mitglieder-Verwaltung(.*)/).click
+  page_memberlist = page_memberlist.link_with(text: /\[Mitgliederliste\]/).click
 
-  parser = page_memberlist.parser
-  parser.css('center tr td').each do |e|
+  page_memberlist.parser.css('center tr td').each do |e|
     email = ''
     name = ''
 
